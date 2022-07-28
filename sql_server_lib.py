@@ -14,7 +14,9 @@ class sql_server_database():
 
 	def connect(self):
 		""" Connexion à la DB """
-		self.db = pyodbc.connect("DRIVER={SQL Server};SERVER=" + self.host + "," + self.port + ";DATABASE=" + self.database + ";UID=" + self.user + ";PWD=" + self.password )
+		# On prend le premier driver dispo
+		driver = pyodbc.drivers()[0]
+		self.db = pyodbc.connect("DRIVER={" + driver + "};SERVER=" + self.host + "," + self.port + ";DATABASE=" + self.database + ";UID=" + self.user + ";PWD=" + self.password )
 		if self.db is None:
 			return False
 		else:
