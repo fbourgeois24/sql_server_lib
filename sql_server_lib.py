@@ -1,4 +1,5 @@
-import pyodbc # Install with 'pip install pyodbc' 
+import pyodbc # Install with 'pip install pyodbc'
+import struct 
 
 """ Utilitaires pour gérer une db mariadb """
 class sql_server_database():
