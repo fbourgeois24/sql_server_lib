@@ -63,6 +63,7 @@ class sql_server_database():
 				self.cursor.execute(query, params)
 			else:
 				self.cursor.execute(query)
+			self.db.add_output_converter(-155, self.handle_datetimeoffset)
 			# Si pas de commit ce sera une récupération
 			if not commit or "RETURNING" in query:	
 				if fetch == "all":
@@ -96,10 +97,9 @@ class sql_server_database():
 	def fetchone(self):
 		""" Méthode pour le fetchone """
 		return self.cursor.fetchone()
-
-# Test
-if __name__ == "__main__":
-	db = sql_server_database("BI_ODS_AIES", "10.12.84.242", "3437", db_user="aies_db2db", db_password="N<mD6h8+q*dQC(\[")
-
-	result = db.exec(''' SELECT * FROM ds.MarketHeadpoint WHERE ID_D722_MarketHeadpoint = 1 ;''', fetch='one')
-	print(result)
+	
+	def handle_datetimeoffset(dto_value):
+	    # ref: https://github.com/mkleehammer/pyodbc/issues/134#issuecomment-281739794
+	    tup = struct.unpack("<6hI2h", dto_value)  # e.g., (2017, 3, 16, 10, 35, 18, 0, -6, 0)
+	    tweaked = [tup[i] // 100 if i == 6 else tup[i] for i in range(len(tup))]
+	    return "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}.{:07d} {:+03d}:{:02d}".format(*tweaked)
